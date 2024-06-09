@@ -23,3 +23,5 @@ ADD ./pm_config.json /opt/plugin-manager/config.json
 ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
 
 RUN chmod +x /opt/cohesive/container_shutdown.sh
+
+CMD ["/usr/bin/supervisord"]
