@@ -1,0 +1,36 @@
+{
+  "log_files": [
+    {
+      "path": "/mnt/logs/plugins/proxy46/proxy46.stdout.log",
+      "description": "Proxy46 stdout Log"
+    },
+    {
+      "path": "/mnt/logs/plugins/proxy46/proxy46.stderr.log",
+      "description": "Proxy46 stderr Log"
+    }
+  ],
+  "configuration_files": [
+    {
+      "name": "Proxy46",
+      "path": "/opt/proxy46/proxy46.conf",
+      "description": "Configuration for addressing"
+    }
+  ],
+  "executables": [
+    {
+      "name": "Check state",
+      "path": "/opt/proxy46/state_check.sh",
+      "description": "Verify required components for operation",
+      "commands": {
+        "Run": ""
+      }
+    }
+  ],
+  "process_manager": {
+    "name": "supervisor",
+    "subprocesses": [
+      "proxy46",
+      "bind"
+    ]
+  }
+}
