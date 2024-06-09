@@ -24,4 +24,4 @@ ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
 
 RUN chmod +x /opt/cohesive/container_shutdown.sh
 
-CMD ["bash -c 'mkdir -p /mnt/logs/plugins/proxy46 && /usr/bin/supervisord'"]
+CMD ["/bin/bash", "-c", "mkdir -p /mnt/logs/plugins/proxy46 && /usr/bin/supervisord"]
