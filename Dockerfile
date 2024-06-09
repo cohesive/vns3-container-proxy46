@@ -20,11 +20,6 @@ ADD get4for6.default.conf /opt/proxy46/proxy46.conf
 ADD ./container_shutdown.sh /opt/cohesive/
 ADD ./pm_config.json /opt/plugin-manager/config.json
 
-ADD ./helloworld/helloworld.sh /opt/helloworld/
-ADD ./helloworld/helloworld.conf /opt/helloworld/
-ADD ./helloworld/setup.sh /opt/helloworld/
-
-ADD ./supervisor_configs/helloworld.conf /opt/helloworld/
-ADD ./supervisor_configs/autoconf.conf /etc/supervisor/conf.d/
+ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
 
 RUN chmod +x /opt/cohesive/container_shutdown.sh
