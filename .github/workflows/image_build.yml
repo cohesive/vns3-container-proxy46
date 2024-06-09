@@ -1,0 +1,9 @@
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    uses: cohesive/vns3-plugin-github-action/.github/workflows/image_build.yml@main
+    secrets: inherit
