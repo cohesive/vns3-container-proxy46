@@ -1,9 +1,85 @@
+name: Build Docker image
+
+#on:
+#  push:
+#    tags:
+#      - '*'
+
 on:
-  push:
-    tags:
-      - '*'
+  workflow_call:
 
 jobs:
+
   build:
-    uses: cohesive/vns3-plugin-github-action/.github/workflows/image_build.yml@main
-    secrets: inherit
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Import VNS3 Base Image
+      run: |
+        docker import  ${{ secrets.VNS3_BASE_IMAGE_URL }} vns3local:vns3_base
+
+    - name: Build New Image 
+      run: |
+        docker build -t image .
+
+    - name: Start Container from Image
+      run: |
+        docker run -d image
+
+    - name: Export Container 
+      run: |
+        docker export $(docker ps -q -l) -o image.tar
+
+    - name: Compress Image  
+      run: |
+        gzip image.tar 
+              
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Copy image to S3
+      run: |
+          repo=${{ github.repository }} 
+          name=${repo#*/}
+          date=$(date +%Y%m%d)
+          tag=${{ github.ref_name }}
+          aws s3 cp image.tar.gz "s3://${{ secrets.AWS_S3_BUCKET }}/${name}-${date}-${tag}.tar.gz"
+  
+    - name: Generate 1 week pre-signed URL
+      id: presign
+      run: |
+          repo=${{ github.repository }} 
+          name=${repo#*/}
+          date=$(date +%Y%m%d)
+          tag=${{ github.ref_name }}
+          echo $tag
+          PRESIGN_URL=$(aws s3 presign "s3://${{ secrets.AWS_S3_BUCKET }}/${name}-${date}-${tag}.tar.gz" --expires-in 604800)
+          echo "::set-output name=PRESIGN_URL::$PRESIGN_URL"
+          
+    - name: Post pre-signed URL to Slack
+      id: slack
+      uses: slackapi/slack-github-action@v1.26.0
+      with:
+        payload: |
+          {
+            "text": "GitHub Action build result: ${{ job.status }}\n${{ github.event.pull_request.html_url || github.event.head_commit.url }}",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Plugin Image uploaded to Dev Repo.  Download your image: ${{ steps.presign.outputs.PRESIGN_URL }}"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
