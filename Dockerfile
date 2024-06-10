@@ -25,4 +25,11 @@ ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
 RUN chmod +x /opt/cohesive/container_shutdown.sh
 
 ENTRYPOINT ["/bin/sh", "-c", "mkdir -p /mnt/logs/plugins/proxy46 && /bin/sh", "-c"]
+
+COPY entrypoint.sh /entrypoint.sh
+
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
 CMD ["/usr/bin/supervisord"]
