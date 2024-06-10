@@ -16,20 +16,17 @@ RUN apt update && \
 
 ADD get4for6 /opt/proxy46/
 ADD get4for6.default.conf /opt/proxy46/proxy46.conf
-
 ADD ./container_shutdown.sh /opt/cohesive/
 ADD ./pm_config.json /opt/plugin-manager/config.json
-
+ADD ./proxy46/state_check.sh /opt/proxy46/
 ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
+ADD entrypoint.sh /entrypoint.sh
 
-RUN chmod +x /opt/cohesive/container_shutdown.sh
+RUN chmod +x /opt/cohesive/container_shutdown.sh && \
+    chmod +x /opt/proxy64/state_check.sh && \
+    chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/bin/sh", "-c", "mkdir -p /mnt/logs/plugins/proxy46 && /bin/sh", "-c"]
+CMD ["/entrypoint.sh"]
 
-COPY entrypoint.sh /entrypoint.sh
 
-RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
-
-CMD ["/usr/bin/supervisord"]
