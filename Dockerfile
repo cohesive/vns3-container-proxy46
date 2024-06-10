@@ -18,7 +18,7 @@ ADD get4for6 /opt/proxy46/
 ADD get4for6.default.conf /opt/proxy46/proxy46.conf
 ADD ./container_shutdown.sh /opt/cohesive/
 ADD ./pm_config.json /opt/plugin-manager/config.json
-ADD ./proxy46/state_check.sh /opt/proxy46/
+ADD ./state_check.sh /opt/proxy46/
 ADD ./supervisor_configs/proxy46.conf /etc/supervisor/conf.d/
 ADD entrypoint.sh /entrypoint.sh
 
